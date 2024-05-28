@@ -1,7 +1,6 @@
-"use client";
 import { Button } from "@/components/button";
 import { Input } from "@/components/input";
-import { UserSquare } from "@phosphor-icons/react";
+import { UserSquare } from "@phosphor-icons/react/dist/ssr";
 
 export default function Home() {
   return (
