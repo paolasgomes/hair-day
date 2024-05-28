@@ -2,7 +2,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 
 export const button = tv({
-  base: "h-[3.5rem] rounded-[0.5rem] flex items-center justify-center w-full uppercase ",
+  base: "h-[3.5rem] rounded-[8px] flex items-center justify-center w-full uppercase ",
   variants: {
     variant: {
       primary:
