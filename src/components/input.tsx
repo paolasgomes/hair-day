@@ -1,16 +1,12 @@
-import { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { VariantProps, tv } from "tailwind-variants";
 
-export const root = tv({
+const root = tv({
   base: "h-[3rem]   rounded-[8px] w-full flex px-[0.875rem] py-[1rem] flex gap-[0.5rem] items-center",
   variants: {
     variant: {
       primary:
         "bg-transparent border border-gray-500 placeholder:text-gray-400 text-gray-200  text-[1rem] focus-within:border-yellow-dark",
-    },
-    disabled: {
-      true: " cursor-not-allowed ",
-      false: "",
     },
   },
   defaultVariants: {
@@ -19,7 +15,6 @@ export const root = tv({
   compoundVariants: [
     {
       variant: "primary",
-      disabled: true,
       className: "",
     },
   ],
@@ -37,8 +32,8 @@ type SlotProps = ComponentProps<"div"> & {
   children: ReactNode;
 };
 
-function Root({ className, variant, disabled, ...props }: RootProps) {
-  return <div className={root({ className, variant, disabled })} {...props} />;
+function Root({ className, variant, ...props }: RootProps) {
+  return <div className={root({ className, variant })} {...props} />;
 }
 
 function Field({ type = "text", ...props }: FieldProps) {

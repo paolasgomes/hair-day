@@ -1,8 +1,8 @@
 import type { ComponentProps, ReactNode } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 
-export const button = tv({
-  base: "h-[3.5rem] rounded-[8px] flex items-center justify-center w-full uppercase ",
+const root = tv({
+  base: "h-[3.5rem] rounded-[8px] flex items-center justify-center w-full uppercase cursor-pointer",
   variants: {
     variant: {
       primary:
@@ -25,14 +25,18 @@ export const button = tv({
   ],
 });
 
-type Variants = VariantProps<typeof button> & ComponentProps<"button">;
+type Variants = VariantProps<typeof root> & ComponentProps<"button">;
 
 type Props = Variants & {
   children: ReactNode;
 };
 
-export const Button = ({ className, variant, disabled, ...props }: Props) => {
+function Root({ className, variant, disabled, ...props }: Props) {
   return (
-    <button className={button({ className, variant, disabled })} {...props} />
+    <button className={root({ className, variant, disabled })} {...props} />
   );
+}
+
+export const Button = {
+  Root,
 };
