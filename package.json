@@ -10,13 +10,17 @@
     "prepare": "husky",
     "commitlint": "commitlint --edit",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "db:up": "docker compose -f docker-compose.yml up -d"
   },
   "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "@t3-oss/env-core": "^0.10.1",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-variants": "^0.2.1"
+    "tailwind-variants": "^0.2.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
@@ -36,6 +40,7 @@
     "lint-staged": "^15.2.5",
     "postcss": "^8",
     "prettier": "^3.2.5",
+    "prisma": "^5.14.0",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5"
