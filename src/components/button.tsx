@@ -10,26 +10,19 @@ const root = tv({
     },
     disabled: {
       true: "opacity-30 cursor-not-allowed hover:enabled:border-transparent",
-      false: "",
     },
   },
   defaultVariants: {
     variant: "primary",
   },
-  compoundVariants: [
-    {
-      variant: "primary",
-      disabled: true,
-      className: "",
-    },
-  ],
 });
 
-type Variants = VariantProps<typeof root> & ComponentProps<"button">;
+type Variants = VariantProps<typeof root>;
 
-type Props = Variants & {
-  children: ReactNode;
-};
+type Props = Variants &
+  ComponentProps<"button"> & {
+    children: ReactNode;
+  };
 
 function Root({ className, variant, disabled, ...props }: Props) {
   return (

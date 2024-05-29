@@ -17,7 +17,9 @@ export default function Home() {
         <Input.Field />
       </Input.Root>
 
-      <TimeSelect.Root checked>09:00</TimeSelect.Root>
+      <TimeSelect.Root checked disabled>
+        09:00
+      </TimeSelect.Root>
     </main>
   );
 }

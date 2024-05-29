@@ -6,47 +6,27 @@ const root = tv({
   variants: {
     variant: {
       primary:
-        "bg-gray-600 border border-gray-500 text-gray-200 text-[1rem] hover:bg-gray-500",
-    },
-    disabled: {
-      true: "bg-transparent cursor-not-allowed hover:enabled:bg-transparent text-gray-500",
-      false: "",
-    },
-    checked: {
-      true: "border-yellow-default text-yellow-default",
-      false: "",
+        "bg-gray-600 border border-gray-500 text-gray-200 text-[1rem] disabled:bg-transparent disabled:cursor-not-allowed hover:enabled:bg-gray-500 disabled:text-gray-500 data-[checked=true]:border-yellow-default data-[checked=true]:text-yellow-default",
     },
   },
   defaultVariants: {
     variant: "primary",
   },
-  compoundVariants: [
-    {
-      variant: "primary",
-      disabled: true,
-      checked: true,
-      className: "",
-    },
-  ],
 });
 
-type Variants = VariantProps<typeof root> & ComponentProps<"button">;
+type Variants = VariantProps<typeof root>;
 
-type Props = Variants & {
-  checked: boolean;
-  children: ReactNode;
-};
+type Props = Variants &
+  ComponentProps<"button"> & {
+    checked: boolean;
+    children: ReactNode;
+  };
 
-export function Root({
-  className,
-  variant,
-  disabled,
-  checked,
-  ...props
-}: Props) {
+export function Root({ className, variant, checked, ...props }: Props) {
   return (
     <button
-      className={root({ className, variant, disabled, checked })}
+      data-checked={checked}
+      className={root({ className, variant })}
       {...props}
     />
   );
