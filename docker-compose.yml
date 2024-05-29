@@ -1,5 +1,6 @@
 services:
-  postgres-database:
+  postgres:
+    container_name: hairday_db
     image: postgres:alpine3.20
     ports:
       - 5432:5432
