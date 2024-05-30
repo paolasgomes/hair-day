@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --yellow-light: #dbc170;
   --yellow: #b8952e;
+  --yellow-light: #dbc170;
   --yellow-dark: #846f2e;
 
   --gray-100: #f5f4f5;

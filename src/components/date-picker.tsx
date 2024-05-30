@@ -1,6 +1,17 @@
-import { DayPicker } from "react-day-picker";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import { format } from "date-fns";
+import {
+  type CaptionProps,
+  DayPicker,
+  useNavigation,
+  DayPickerSingleProps,
+} from "react-day-picker";
+import { ptBR } from "date-fns/locale/pt-BR";
+import "react-day-picker/dist/style.css";
 
-export function DatePicker() {
+type RootProps = Omit<DayPickerSingleProps, "mode">;
+
+function Root({ ...props }: RootProps) {
   return (
     <DayPicker
       mode="single"
@@ -8,9 +19,8 @@ export function DatePicker() {
         root: {
           fontFamily: "var(--font-catamaran)",
           fontSize: "0.875rem",
-          backgroundColor: "white",
-          borderRadius: "0.25rem",
-          boxShadow: "0px 4px 8px 0px rgba(102, 102, 102, 0.25)",
+          backgroundColor: "var(--gray-600)",
+          borderRadius: "8px",
           width: "100%",
           padding: "1rem",
           margin: 0,
@@ -18,21 +28,17 @@ export function DatePicker() {
         day: {
           width: "2rem",
           height: "2rem",
-          color: "#27282B",
-          backgroundColor: "white",
+          fontSize: "0.875rem",
+          color: "var(--gray-200)",
+          backgroundColor: "var(--gray-600)",
           outline: "none",
           cursor: "pointer",
         },
-        caption_label: {
-          textTransform: "capitalize",
-          padding: 0,
-        },
-        nav_icon: {
-          width: "0.75rem",
-          height: "0.75rem",
-        },
+
         head_cell: {
           width: "2rem",
+          color: "var(--gray-400)",
+          fontWeight: "bold",
         },
         cell: {
           width: "2rem",
@@ -40,27 +46,53 @@ export function DatePicker() {
         table: {
           width: "100%",
         },
-        month: {
-          width: "100%",
-        },
-        nav_button_previous: {
-          backgroundColor: "white",
-          cursor: "pointer",
-        },
-        nav_button_next: {
-          backgroundColor: "white",
-          cursor: "pointer",
+      }}
+      components={{
+        Caption,
+      }}
+      modifiersStyles={{
+        selected: {
+          backgroundColor: "var(--gray-500)",
+          color: "var(--yellow)",
+          border: "1px solid",
+          borderColor: "var(--yellow)",
+          borderRadius: "4px",
+          fontWeight: "bold",
         },
       }}
-      //   modifiersStyles={{
-      //     selected: {
-      //       backgroundColor: "#2B9529",
-      //       color: "white",
-      //     },
-      //     outside: {
-      //       color: "#61646B",
-      //     },
-      //   }}
+      fixedWeeks
+      showOutsideDays
+      {...props}
     />
   );
 }
+
+function Caption({ displayMonth }: CaptionProps) {
+  const { goToMonth, nextMonth, previousMonth } = useNavigation();
+
+  return (
+    <div className="flex justify-between p-[0.5rem] items-center">
+      <button
+        className="group"
+        disabled={!previousMonth}
+        onClick={() => previousMonth && goToMonth(previousMonth)}
+      >
+        <CaretLeft className="text-gray-200 text-[1.25rem] group-hover:text-gray-100" />
+      </button>
+      <span className="text-gray-100 font-bold text-center capitalize">
+        {format(displayMonth, "MMMM yyy", { locale: ptBR })}
+      </span>
+      <button
+        className="group"
+        disabled={!nextMonth}
+        onClick={() => nextMonth && goToMonth(nextMonth)}
+      >
+        <CaretRight className="text-gray-200 text-[1.25rem] group-hover:text-gray-100" />
+      </button>
+    </div>
+  );
+}
+
+export const DatePicker = {
+  Root,
+};

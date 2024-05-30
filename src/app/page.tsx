@@ -29,7 +29,7 @@ export default function Home() {
             </Popover.Trigger>
             <Popover.Portal>
               <Popover.Content>
-                <DatePicker />
+                <DatePicker.Root />
               </Popover.Content>
             </Popover.Portal>
           </Popover.Root>
