@@ -1,46 +1,40 @@
 import prisma from "@/libs/prisma";
-import { isValid } from "date-fns";
+import { isValid, parse } from "date-fns";
 import { type NextRequest, NextResponse } from "next/server";
 import { ZodError, z } from "zod";
-import { getTime } from "../(helpers)/get-time";
-import { InvalidDateValidationError } from "../(errors)/invalid-date-validation-error";
+import { getHoursAndMinutes } from "../(helpers)/get-hours-and-minutes";
 import { AlreadyExistsScheduleForThisTimeError } from "../(errors)/already-exists-schedule-for-this-time-error";
 
 const schema = z.object({
   customerName: z.string().min(1),
+  date: z
+    .string()
+    .min(1)
+    .refine((v) => isValid(parse(v, "dd/MM/yyyy", new Date())), "Invalid date"),
   time: z
     .string()
     .min(1)
     .refine((v) => {
-      const { hours } = getTime(v);
+      const { hours, minutes } = getHoursAndMinutes(v);
 
-      if (hours < 9 || hours > 20) {
+      if (minutes > 0 || hours < 9 || hours > 21) {
         return false;
       }
 
       return true;
-    }, "Time of schedule must be between 9am and 8pm")
-    .transform(getTime),
+    }, "Time of schedule must be between 9am and 9pm and minutes not be greater than zero"),
 });
 
 export async function POST(req: NextRequest) {
   try {
-    const { customerName, time } = schema.parse(await req.json());
+    const data = schema.parse(await req.json());
 
-    const { timeStamp } = time;
-
-    if (!isValid(timeStamp)) {
-      throw new InvalidDateValidationError();
-    }
-
-    const data = {
-      customerName,
-      time: timeStamp,
-    };
+    const { time, date } = data;
 
     const alreadyExistsScheduleForThisTime = await prisma.schedule.findFirst({
       where: {
-        time: timeStamp,
+        time,
+        date,
       },
     });
 
@@ -59,15 +53,6 @@ export async function POST(req: NextRequest) {
       },
     );
   } catch (error) {
-    if (error instanceof InvalidDateValidationError) {
-      return NextResponse.json(
-        { message: error.message },
-        {
-          status: error.statusCode,
-        },
-      );
-    }
-
     if (error instanceof AlreadyExistsScheduleForThisTimeError) {
       return NextResponse.json(
         { message: error.message },

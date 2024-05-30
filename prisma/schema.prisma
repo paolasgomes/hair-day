@@ -10,7 +10,8 @@ datasource db {
 model Schedule {
   id           String   @id @default(uuid())
   customerName String
-  time         DateTime @db.Timestamp(6)
+  date         String
+  time         String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
