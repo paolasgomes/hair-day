@@ -1,6 +1,6 @@
-function getHoursAndMinutes(time: string) {
-  const hours = Number(time.split(":")[0]);
-  const minutes = Number(time.split(":")[1]);
+function getHoursAndMinutes(value: string) {
+  const hours = Number(value.split(":")[0]);
+  const minutes = Number(value.split(":")[1]);
 
   return { hours, minutes };
 }
