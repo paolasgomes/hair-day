@@ -11,7 +11,8 @@
     "commitlint": "commitlint --edit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "db:up": "docker compose -f docker-compose.yml up -d"
+    "db:up": "docker compose -f docker-compose.yml up -d",
+    "db:down": "docker compose down"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.5",
