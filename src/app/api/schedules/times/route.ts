@@ -1,1 +1,1 @@
-export { GET } from "./get-times";
+export { GET } from "./get-enabled-times-by-date";
