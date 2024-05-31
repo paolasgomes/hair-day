@@ -54,6 +54,7 @@ function Root({ ...props }: RootProps) {
         },
         table: {
           width: "100%",
+          maxWidth: "100%",
         },
         month: {
           width: "100%",

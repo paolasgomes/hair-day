@@ -35,30 +35,26 @@ export function Content() {
 
           <label className="text-gray-200 font-bold flex flex-col gap-[0.5rem]">
             Data
-            <Input.Root>
-              <Input.Slot>
-                <Popover.Root>
-                  <Popover.Trigger>
+            <Popover.Root>
+              <Popover.Trigger>
+                <Input.Root className="group-data-[state=open]:border-yellow-dark">
+                  <Input.Slot>
                     <CalendarBlank className="text-yellow-default text-[1.25rem]" />
-                  </Popover.Trigger>
-                  <Popover.Portal>
-                    <Popover.Content
-                      align="start"
-                      alignOffset={-18}
-                      className="w-[21.125rem]"
-                    >
-                      <DatePicker.Root />
-                    </Popover.Content>
-                  </Popover.Portal>
-                </Popover.Root>
-              </Input.Slot>
+                  </Input.Slot>
 
-              <Input.Field />
+                  <Input.Field readOnly />
 
-              <Input.Slot>
-                <CaretDown className="text-gray-300 text-[1rem]" />
-              </Input.Slot>
-            </Input.Root>
+                  <Input.Slot>
+                    <CaretDown className="text-gray-300 text-[1rem] group-data-[state=open]:rotate-180 transition group-data-[state=closed]:rotate-0" />
+                  </Input.Slot>
+                </Input.Root>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Content align="start" className="w-[21.125rem]">
+                  <DatePicker.Root />
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
           </label>
 
           <div className="flex flex-col gap-[0.5rem]">
@@ -127,30 +123,28 @@ export function Content() {
               </sub>
             </div>
 
-            <Input.Root className="w-[min(10rem,_100%)]  self-center">
-              <Input.Slot>
-                <Popover.Root>
-                  <Popover.Trigger>
-                    <CalendarBlank className="text-yellow-default text-[1.25rem]" />
-                  </Popover.Trigger>
-                  <Popover.Portal>
-                    <Popover.Content
-                      align="end"
-                      alignOffset={-125}
-                      className="w-[21.125rem]"
-                    >
-                      <DatePicker.Root />
-                    </Popover.Content>
-                  </Popover.Portal>
-                </Popover.Root>
-              </Input.Slot>
+            <div className="w-[min(10rem,_100%)] self-center ">
+              <Popover.Root>
+                <Popover.Trigger>
+                  <Input.Root className="group-data-[state=open]:border-yellow-dark">
+                    <Input.Slot>
+                      <CalendarBlank className="text-yellow-default text-[1.25rem]" />
+                    </Input.Slot>
 
-              <Input.Field />
+                    <Input.Field readOnly />
 
-              <Input.Slot>
-                <CaretDown className="text-gray-300 text-[1rem]" />
-              </Input.Slot>
-            </Input.Root>
+                    <Input.Slot>
+                      <CaretDown className="text-gray-300 text-[1rem] group-data-[state=open]:rotate-180 transition group-data-[state=closed]:rotate-0" />
+                    </Input.Slot>
+                  </Input.Root>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content align="end" className="w-[21.125rem]">
+                    <DatePicker.Root />
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+            </div>
           </div>
 
           <div className="flex flex-col gap-[0.75rem] ">

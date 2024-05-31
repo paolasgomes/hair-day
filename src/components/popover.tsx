@@ -23,14 +23,14 @@ function Root({ ...props }: RootProps) {
 }
 
 function Trigger({ className, ...props }: TriggerProps) {
-  return <PopoverTrigger className={twMerge("", className)} {...props} />;
+  return <PopoverTrigger className={twMerge("group", className)} {...props} />;
 }
 
 function Portal({ ...props }: PortalProps) {
   return <PopoverPortal {...props} />;
 }
 
-function Content({ className, sideOffset = 20, ...props }: ContentProps) {
+function Content({ className, sideOffset = 5, ...props }: ContentProps) {
   return (
     <PopoverContent
       className={twMerge("w-full", className)}
