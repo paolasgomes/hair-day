@@ -8,6 +8,7 @@ import {
   Portal as PopoverPortal,
   Content as PopoverContent,
 } from "@radix-ui/react-popover";
+import { forwardRef } from "react";
 import { twMerge } from "tailwind-merge";
 
 type RootProps = PopoverProps;
@@ -30,15 +31,20 @@ function Portal({ ...props }: PortalProps) {
   return <PopoverPortal {...props} />;
 }
 
-function Content({ className, sideOffset = 5, ...props }: ContentProps) {
-  return (
-    <PopoverContent
-      className={twMerge("w-full", className)}
-      sideOffset={sideOffset}
-      {...props}
-    />
-  );
-}
+const Content = forwardRef<HTMLDivElement, ContentProps>(
+  ({ className, sideOffset = 5, ...props }, ref) => {
+    return (
+      <PopoverContent
+        ref={ref}
+        className={twMerge("w-full", className)}
+        sideOffset={sideOffset}
+        {...props}
+      />
+    );
+  },
+);
+
+Content.displayName = "Content";
 
 export const Popover = {
   Root,

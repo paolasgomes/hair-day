@@ -111,7 +111,7 @@ export function Content() {
           <Button.Root>Agendar</Button.Root>
         </form>
       </section>
-      <section className="flex justify-center flex-1  ">
+      <section className="flex justify-center flex-1">
         <div className=" basis-[42.625rem] flex flex-col gap-[2rem] py-[5rem]">
           <div className="flex justify-between">
             <div className="flex-1">
