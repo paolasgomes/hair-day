@@ -36,13 +36,11 @@ export function Content() {
           <label className="text-gray-200 font-bold flex flex-col gap-[0.5rem]">
             Data
             <Popover.Root>
-              <Popover.Trigger>
-                <Input.Root className="group-data-[state=open]:border-yellow-dark">
+              <Popover.Trigger className="group w-full">
+                <Input.Root className="group-data-[state=open]:border-yellow-dark justify-between">
                   <Input.Slot>
                     <CalendarBlank className="text-yellow-default text-[1.25rem]" />
                   </Input.Slot>
-
-                  <Input.Field readOnly />
 
                   <Input.Slot>
                     <CaretDown className="text-gray-300 text-[1rem] group-data-[state=open]:rotate-180 transition group-data-[state=closed]:rotate-0" />
@@ -123,15 +121,13 @@ export function Content() {
               </sub>
             </div>
 
-            <div className="w-[min(10rem,_100%)] self-center ">
+            <div className="w-[min(10rem,_100%)] self-center">
               <Popover.Root>
-                <Popover.Trigger>
-                  <Input.Root className="group-data-[state=open]:border-yellow-dark">
+                <Popover.Trigger className="group w-full">
+                  <Input.Root className="group-data-[state=open]:border-yellow-dark w-full justify-between">
                     <Input.Slot>
                       <CalendarBlank className="text-yellow-default text-[1.25rem]" />
                     </Input.Slot>
-
-                    <Input.Field readOnly />
 
                     <Input.Slot>
                       <CaretDown className="text-gray-300 text-[1rem] group-data-[state=open]:rotate-180 transition group-data-[state=closed]:rotate-0" />

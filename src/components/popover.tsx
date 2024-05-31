@@ -24,7 +24,7 @@ function Root({ ...props }: RootProps) {
 }
 
 function Trigger({ className, ...props }: TriggerProps) {
-  return <PopoverTrigger className={twMerge("group", className)} {...props} />;
+  return <PopoverTrigger className={twMerge("", className)} {...props} />;
 }
 
 function Portal({ ...props }: PortalProps) {
