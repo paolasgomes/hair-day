@@ -2,19 +2,28 @@ import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import {
   type CaptionProps,
+  type DayPickerSingleProps,
   DayPicker,
   useNavigation,
-  DayPickerSingleProps,
+  DateFormatter,
 } from "react-day-picker";
 import { ptBR } from "date-fns/locale/pt-BR";
 import "react-day-picker/dist/style.css";
 
 type RootProps = Omit<DayPickerSingleProps, "mode">;
 
+const formatWeekdayName: DateFormatter = (date) => (
+  <>{date?.toLocaleDateString("pt-BR", { weekday: "narrow" })}</>
+);
+
 function Root({ ...props }: RootProps) {
   return (
     <DayPicker
       mode="single"
+      locale={ptBR}
+      formatters={{
+        formatWeekdayName,
+      }}
       styles={{
         root: {
           fontFamily: "var(--font-catamaran)",
@@ -46,6 +55,9 @@ function Root({ ...props }: RootProps) {
         table: {
           width: "100%",
         },
+        month: {
+          width: "100%",
+        },
       }}
       components={{
         Caption,
@@ -71,7 +83,7 @@ function Caption({ displayMonth }: CaptionProps) {
   const { goToMonth, nextMonth, previousMonth } = useNavigation();
 
   return (
-    <div className="flex justify-between p-[0.5rem] items-center">
+    <div className="flex justify-between py-[0.5rem]  items-center">
       <button
         className="group"
         disabled={!previousMonth}

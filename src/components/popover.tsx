@@ -30,10 +30,10 @@ function Portal({ ...props }: PortalProps) {
   return <PopoverPortal {...props} />;
 }
 
-function Content({ className, sideOffset = 18, ...props }: ContentProps) {
+function Content({ className, sideOffset = 20, ...props }: ContentProps) {
   return (
     <PopoverContent
-      className={twMerge("", className)}
+      className={twMerge("w-full", className)}
       sideOffset={sideOffset}
       {...props}
     />
