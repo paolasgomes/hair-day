@@ -41,7 +41,7 @@ function Field({ type = "text", className, ...props }: FieldProps) {
     <input
       type={type}
       className={twMerge(
-        "flex-1 h-full outline-none bg-transparent group-data-[variant=primary]:font-normal group-data-[variant=primary]:placeholder:text-gray-400 group-data-[variant=primary]:text-gray-200",
+        "flex-1 h-full  w-full outline-none bg-transparent group-data-[variant=primary]:font-normal group-data-[variant=primary]:placeholder:text-gray-400 group-data-[variant=primary]:text-gray-200",
         className,
       )}
       {...props}
@@ -50,7 +50,9 @@ function Field({ type = "text", className, ...props }: FieldProps) {
 }
 
 function Slot({ className, ...props }: SlotProps) {
-  return <div className={twMerge("", className)} {...props} />;
+  return (
+    <div className={twMerge("flex justify-center", className)} {...props} />
+  );
 }
 
 export const Input = {
