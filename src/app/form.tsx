@@ -6,7 +6,7 @@ import { Popover } from "@/components/popover";
 import { TimeSelect } from "@/components/time-select";
 import { api } from "@/libs/axios";
 import { CalendarBlank, CaretDown, UserSquare } from "@phosphor-icons/react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +23,12 @@ type AvailableTimesByDate = {
   evening: Time[];
 };
 
+type CreateSchedule = {
+  date: string;
+  time: string;
+  customerName: string;
+};
+
 type ScheduleForm = z.infer<typeof schema>;
 
 const schema = z.object({
@@ -30,6 +36,7 @@ const schema = z.object({
   customer: z
     .string({ required_error: "Informe o nome do cliente" })
     .min(1, "Informe o nome do cliente"),
+  time: z.string().min(1),
 });
 
 const getAvailableTimesByDate = async (date: string) => {
@@ -40,6 +47,10 @@ const getAvailableTimesByDate = async (date: string) => {
   });
 
   return data;
+};
+
+const createSchedule = async (data: CreateSchedule) => {
+  await api.post("/schedules", data);
 };
 
 export function Form() {
@@ -61,8 +72,21 @@ export function Form() {
     queryFn: () => getAvailableTimesByDate(formattedDate(date)),
   });
 
-  const onSubmit = (data: ScheduleForm) => {
-    console.log(" => ", data);
+  const { mutate: handleCreateSchedule } = useMutation({
+    mutationKey: ["create-schedule"],
+    mutationFn: createSchedule,
+  });
+
+  const onSubmit = ({ date, customer, time }: ScheduleForm) => {
+    if (date) {
+      const normalizedData: CreateSchedule = {
+        date: format(date, "dd/MM/yyyy"),
+        customerName: customer,
+        time,
+      };
+
+      handleCreateSchedule(normalizedData);
+    }
   };
 
   return (
@@ -120,9 +144,21 @@ export function Form() {
 
           <div className="flex flex-wrap gap-[0.5rem]">
             {availableTimesByDate?.morning.map(({ enabled, time }) => (
-              <TimeSelect.Root key={time} checked={enabled}>
-                {time}
-              </TimeSelect.Root>
+              <Controller
+                name="time"
+                key={time}
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <TimeSelect.Root
+                    value={value}
+                    disabled={!enabled}
+                    onClick={() => onChange(time)}
+                    checked={value === time}
+                  >
+                    {time}
+                  </TimeSelect.Root>
+                )}
+              />
             ))}
           </div>
         </div>
@@ -131,9 +167,21 @@ export function Form() {
 
           <div className="flex flex-wrap gap-[0.5rem]">
             {availableTimesByDate?.afternoon.map(({ enabled, time }) => (
-              <TimeSelect.Root key={time} checked={enabled}>
-                {time}
-              </TimeSelect.Root>
+              <Controller
+                name="time"
+                key={time}
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <TimeSelect.Root
+                    value={value}
+                    disabled={!enabled}
+                    onClick={() => onChange(time)}
+                    checked={value === time}
+                  >
+                    {time}
+                  </TimeSelect.Root>
+                )}
+              />
             ))}
           </div>
         </div>
@@ -142,9 +190,21 @@ export function Form() {
 
           <div className="flex flex-wrap gap-[0.5rem]">
             {availableTimesByDate?.evening.map(({ enabled, time }) => (
-              <TimeSelect.Root key={time} checked={enabled}>
-                {time}
-              </TimeSelect.Root>
+              <Controller
+                name="time"
+                key={time}
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <TimeSelect.Root
+                    value={value}
+                    disabled={!enabled}
+                    onClick={() => onChange(time)}
+                    checked={value === time}
+                  >
+                    {time}
+                  </TimeSelect.Root>
+                )}
+              />
             ))}
           </div>
         </div>
