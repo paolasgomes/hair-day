@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
 import { catamaran } from "@/fonts";
+import { Providers } from "@/providers";
 
 export const metadata: Metadata = {
   title: "Hair Day",
@@ -14,7 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${catamaran.variable}`}>{children}</body>
+      <body className={`${catamaran.variable}`}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
