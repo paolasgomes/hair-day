@@ -6,7 +6,7 @@ import { Popover } from "@/components/popover";
 import { TimeSelect } from "@/components/time-select";
 import { api } from "@/libs/axios";
 import { CalendarBlank, CaretDown, UserSquare } from "@phosphor-icons/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,16 +54,19 @@ const createSchedule = async (data: CreateSchedule) => {
 };
 
 export function Form() {
+  const queryClient = useQueryClient();
+
   const formattedDate = (date?: Date) => {
     return format(date ? date : new Date(), "dd/MM/yyyy");
   };
 
-  const { register, handleSubmit, watch, control } = useForm<ScheduleForm>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      date: new Date(),
-    },
-  });
+  const { register, handleSubmit, watch, control, reset, getValues } =
+    useForm<ScheduleForm>({
+      resolver: zodResolver(schema),
+      defaultValues: {
+        date: new Date(),
+      },
+    });
 
   const { date } = watch();
 
@@ -75,6 +78,17 @@ export function Form() {
   const { mutate: handleCreateSchedule } = useMutation({
     mutationKey: ["create-schedule"],
     mutationFn: createSchedule,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get-available-times-by-date"],
+      });
+
+      reset({
+        ...getValues(),
+        customer: "",
+        time: "",
+      });
+    },
   });
 
   const onSubmit = ({ date, customer, time }: ScheduleForm) => {
@@ -126,7 +140,11 @@ export function Form() {
                 name="date"
                 control={control}
                 render={({ field: { value, onChange } }) => (
-                  <DatePicker.Root selected={value} onSelect={onChange} />
+                  <DatePicker.Root
+                    disabled={{ before: new Date() }}
+                    selected={value}
+                    onSelect={onChange}
+                  />
                 )}
               />
             </Popover.Content>
