@@ -3,8 +3,8 @@ import {
   MoonStars,
   SunHorizon,
 } from "@phosphor-icons/react/dist/ssr";
-import { Form } from "./form.tsx";
 import { ScheduleByDate } from "./scheduleByDate";
+import { Form } from "./form";
 
 export default function Home() {
   return (

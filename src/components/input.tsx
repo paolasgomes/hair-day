@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from "react";
+import { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import { VariantProps, tv } from "tailwind-variants";
 
@@ -36,9 +36,13 @@ function Root({ className, variant = "primary", ...props }: RootProps) {
   );
 }
 
-function Field({ type = "text", className, ...props }: FieldProps) {
+export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
+  { type = "text", className, ...props },
+  ref,
+) {
   return (
     <input
+      ref={ref}
       type={type}
       className={twMerge(
         "flex-1 h-full  w-full outline-none bg-transparent group-data-[variant=primary]:font-normal group-data-[variant=primary]:placeholder:text-gray-400 group-data-[variant=primary]:text-gray-200",
@@ -47,7 +51,7 @@ function Field({ type = "text", className, ...props }: FieldProps) {
       {...props}
     />
   );
-}
+});
 
 function Slot({ className, ...props }: SlotProps) {
   return (
