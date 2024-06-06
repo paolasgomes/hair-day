@@ -6,19 +6,24 @@ import { Popover } from "@/components/popover";
 import { TimeSelect } from "@/components/time-select";
 import { api } from "@/libs/axios";
 import { CalendarBlank, CaretDown, UserSquare } from "@phosphor-icons/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { formatDate } from "@/helpers/formatDate";
+import { formatDate } from "@/utils/format-date";
 
 type Time = {
   time: string;
   enabled: boolean;
 };
 
-type AvailableTimesByDate = {
+type AvailableTimesByDateInPeriods = {
   afternoon: Time[];
   morning: Time[];
   evening: Time[];
@@ -30,22 +35,25 @@ type CreateSchedule = {
   customerName: string;
 };
 
-type ScheduleForm = z.infer<typeof schema>;
+type NewScheduleForm = z.infer<typeof schema>;
 
 const schema = z.object({
-  date: z.custom<Date | undefined>(),
+  date: z.custom<Date>().refine((v) => !!v),
   customer: z
     .string({ required_error: "Informe o nome do cliente" })
     .min(1, "Informe o nome do cliente"),
   time: z.string().min(1),
 });
 
-const getAvailableTimesByDate = async (date: string) => {
-  const { data } = await api.get<AvailableTimesByDate>("/schedules/times/", {
-    params: {
-      date,
+const getAvailableTimesByDateInPeriods = async (date: string) => {
+  const { data } = await api.get<AvailableTimesByDateInPeriods>(
+    "/schedules/times/",
+    {
+      params: {
+        date,
+      },
     },
-  });
+  );
 
   return data;
 };
@@ -58,7 +66,7 @@ export function Form() {
   const queryClient = useQueryClient();
 
   const { register, handleSubmit, watch, control, reset, getValues } =
-    useForm<ScheduleForm>({
+    useForm<NewScheduleForm>({
       resolver: zodResolver(schema),
       defaultValues: {
         date: new Date(),
@@ -67,9 +75,10 @@ export function Form() {
 
   const { date } = watch();
 
-  const { data: availableTimesByDate } = useQuery({
-    queryKey: ["get-available-times-by-date", date],
-    queryFn: () => getAvailableTimesByDate(formatDate(date)),
+  const { data: availableTimesByDateInPeriods } = useQuery({
+    queryKey: ["get-available-times-by-date-in-periods", date],
+    queryFn: () => getAvailableTimesByDateInPeriods(formatDate(date)),
+    placeholderData: keepPreviousData,
   });
 
   const { mutate: handleCreateSchedule } = useMutation({
@@ -77,22 +86,22 @@ export function Form() {
     mutationFn: createSchedule,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["get-available-times-by-date"],
+        queryKey: ["get-available-times-by-date-in-periods"],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["get-schedules"],
+        queryKey: ["get-schedules-by-date"],
       });
 
       reset({
-        ...getValues(),
+        date: getValues("date"),
         customer: "",
         time: "",
       });
     },
   });
 
-  const onSubmit = ({ date, customer, time }: ScheduleForm) => {
+  const onSubmit = ({ date, customer, time }: NewScheduleForm) => {
     if (date) {
       const normalizedData: CreateSchedule = {
         date: format(date, "dd/MM/yyyy"),
@@ -162,7 +171,7 @@ export function Form() {
           <span className="text-[0.875rem] text-gray-300">Manhã</span>
 
           <div className="flex flex-wrap gap-[0.5rem]">
-            {availableTimesByDate?.morning.map(({ enabled, time }) => (
+            {availableTimesByDateInPeriods?.morning.map(({ enabled, time }) => (
               <Controller
                 name="time"
                 key={time}
@@ -185,30 +194,32 @@ export function Form() {
           <span className="text-[0.875rem] text-gray-300">Tarde</span>
 
           <div className="flex flex-wrap gap-[0.5rem]">
-            {availableTimesByDate?.afternoon.map(({ enabled, time }) => (
-              <Controller
-                name="time"
-                key={time}
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <TimeSelect.Root
-                    value={value}
-                    disabled={!enabled}
-                    onClick={() => onChange(time)}
-                    checked={value === time}
-                  >
-                    {time}
-                  </TimeSelect.Root>
-                )}
-              />
-            ))}
+            {availableTimesByDateInPeriods?.afternoon.map(
+              ({ enabled, time }) => (
+                <Controller
+                  name="time"
+                  key={time}
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <TimeSelect.Root
+                      value={value}
+                      disabled={!enabled}
+                      onClick={() => onChange(time)}
+                      checked={value === time}
+                    >
+                      {time}
+                    </TimeSelect.Root>
+                  )}
+                />
+              ),
+            )}
           </div>
         </div>
         <div className="mt-[0.5rem] flex flex-col gap-[0.75rem]">
           <span className="text-[0.875rem] text-gray-300">Noite</span>
 
           <div className="flex flex-wrap gap-[0.5rem]">
-            {availableTimesByDate?.evening.map(({ enabled, time }) => (
+            {availableTimesByDateInPeriods?.evening.map(({ enabled, time }) => (
               <Controller
                 name="time"
                 key={time}

@@ -1,5 +1,6 @@
 import { type Schedule } from "@prisma/client";
 import { getHoursAndMinutes } from "./get-hours-and-minutes";
+import { orderBy } from "lodash";
 
 type ParsedSchedules = {
   morning: Schedule[];
@@ -15,15 +16,24 @@ function getSchedulesParsed(schedules: Schedule[]) {
       const { hours } = getHoursAndMinutes(time);
 
       if (hours >= 9 && hours <= 12) {
-        return { ...acc, morning: [...acc.morning, schedule] };
+        return {
+          ...acc,
+          morning: orderBy([...acc.morning, schedule], ["time"], ["asc"]),
+        };
       }
 
       if (hours >= 13 && hours <= 18) {
-        return { ...acc, afternoon: [...acc.afternoon, schedule] };
+        return {
+          ...acc,
+          afternoon: orderBy([...acc.afternoon, schedule], ["time"], ["asc"]),
+        };
       }
 
       if (hours >= 19 && hours <= 21) {
-        return { ...acc, evening: [...acc.evening, schedule] };
+        return {
+          ...acc,
+          evening: orderBy([...acc.evening, schedule], ["time"], ["asc"]),
+        };
       }
 
       return acc;

@@ -15,10 +15,9 @@ import { api } from "@/libs/axios";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formatDate } from "@/helpers/formatDate";
-import { orderBy } from "lodash";
+import { formatDate } from "@/utils/format-date";
 
-type Schedules = {
+type Schedule = {
   createdAt: string;
   customerName: string;
   date: string;
@@ -27,20 +26,20 @@ type Schedules = {
   updatedAt: string;
 };
 
-type SchedulesByDate = {
-  morning: Schedules[];
-  evening: Schedules[];
-  afternoon: Schedules[];
+type SchedulesByPeriods = {
+  morning: Schedule[];
+  evening: Schedule[];
+  afternoon: Schedule[];
 };
 
-type SchedulesByDateForm = z.infer<typeof schema>;
+type SchedulesFilterByDate = z.infer<typeof schema>;
 
 const schema = z.object({
-  date: z.custom<Date | undefined>(),
+  date: z.custom<Date>().refine((v) => !!v),
 });
 
 const getSchedulesByDate = async (date: string) => {
-  const { data } = await api.get<SchedulesByDate>("/schedules", {
+  const { data } = await api.get<SchedulesByPeriods>("/schedules", {
     params: {
       date,
     },
@@ -50,7 +49,7 @@ const getSchedulesByDate = async (date: string) => {
 };
 
 export default function Home() {
-  const { control, watch } = useForm<SchedulesByDateForm>({
+  const { control, watch } = useForm<SchedulesFilterByDate>({
     resolver: zodResolver(schema),
     defaultValues: {
       date: new Date(),
@@ -60,14 +59,12 @@ export default function Home() {
   const { date } = watch();
 
   const { data: schedulesByDate } = useQuery({
-    queryKey: ["get-schedules", date],
+    queryKey: ["get-schedules-by-date", date],
     queryFn: () => getSchedulesByDate(formatDate(date)),
-    select: (data) => ({
-      morning: orderBy(data?.morning, ["time"], ["asc"]),
-      afternoon: orderBy(data?.afternoon, ["time"], ["asc"]),
-      evening: orderBy(data?.evening, ["time"], ["asc"]),
-    }),
   });
+
+  const morningSchedulesByDate = schedulesByDate?.morning ?? [];
+  const hasMorningSchedulesByDate = !!morningSchedulesByDate.length;
 
   return (
     <main className="flex h-screen bg-gray-800 ">
@@ -130,8 +127,8 @@ export default function Home() {
               <div className="h-[1px] bg-gray-600" />
 
               <ul className="px-[1.25rem] py-[1.5rem] flex flex-col gap-[0.375rem]">
-                {schedulesByDate?.morning.length ? (
-                  schedulesByDate?.morning.map(({ id, time, customerName }) => (
+                {hasMorningSchedulesByDate &&
+                  morningSchedulesByDate.map(({ id, time, customerName }) => (
                     <li
                       key={id}
                       className="text-gray-400 flex gap-[1.25rem] items-center"
@@ -139,8 +136,9 @@ export default function Home() {
                       <strong className=" font-bold">{time}</strong>
                       {customerName}
                     </li>
-                  ))
-                ) : (
+                  ))}
+
+                {!hasMorningSchedulesByDate && (
                   <li className="text-gray-400 flex gap-[1.25rem] items-center justify-center">
                     Não há nenhum agendamento para o período
                   </li>
