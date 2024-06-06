@@ -11,6 +11,7 @@ import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { formatDate } from "@/helpers/formatDate";
 
 type Time = {
   time: string;
@@ -56,10 +57,6 @@ const createSchedule = async (data: CreateSchedule) => {
 export function Form() {
   const queryClient = useQueryClient();
 
-  const formattedDate = (date?: Date) => {
-    return format(date ? date : new Date(), "dd/MM/yyyy");
-  };
-
   const { register, handleSubmit, watch, control, reset, getValues } =
     useForm<ScheduleForm>({
       resolver: zodResolver(schema),
@@ -72,7 +69,7 @@ export function Form() {
 
   const { data: availableTimesByDate } = useQuery({
     queryKey: ["get-available-times-by-date", date],
-    queryFn: () => getAvailableTimesByDate(formattedDate(date)),
+    queryFn: () => getAvailableTimesByDate(formatDate(date)),
   });
 
   const { mutate: handleCreateSchedule } = useMutation({
@@ -81,6 +78,10 @@ export function Form() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["get-available-times-by-date"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["get-schedules"],
       });
 
       reset({
@@ -126,7 +127,7 @@ export function Form() {
               <Input.Slot className="gap-2 items-center">
                 <CalendarBlank className="text-yellow-default text-[1.25rem]" />
                 <span className="font-normal text-gray-200">
-                  {formattedDate(date)}
+                  {formatDate(date)}
                 </span>
               </Input.Slot>
               <Input.Slot>

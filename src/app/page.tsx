@@ -1,12 +1,74 @@
+"use client";
 import {
+  CalendarBlank,
   CloudSun,
   MoonStars,
   SunHorizon,
 } from "@phosphor-icons/react/dist/ssr";
-import { ScheduleByDate } from "./scheduleByDate";
 import { Form } from "./form";
+import { Popover } from "@/components/popover";
+import { Input } from "@/components/input";
+import { CaretDown } from "@phosphor-icons/react";
+import { DatePicker } from "@/components/date-picker";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/libs/axios";
+import { z } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { formatDate } from "@/helpers/formatDate";
+import { orderBy } from "lodash";
+
+type Schedules = {
+  createdAt: string;
+  customerName: string;
+  date: string;
+  id: string;
+  time: string;
+  updatedAt: string;
+};
+
+type SchedulesByDate = {
+  morning: Schedules[];
+  evening: Schedules[];
+  afternoon: Schedules[];
+};
+
+type SchedulesByDateForm = z.infer<typeof schema>;
+
+const schema = z.object({
+  date: z.custom<Date | undefined>(),
+});
+
+const getSchedulesByDate = async (date: string) => {
+  const { data } = await api.get<SchedulesByDate>("/schedules", {
+    params: {
+      date,
+    },
+  });
+
+  return data;
+};
 
 export default function Home() {
+  const { control, watch } = useForm<SchedulesByDateForm>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      date: new Date(),
+    },
+  });
+
+  const { date } = watch();
+
+  const { data: schedulesByDate } = useQuery({
+    queryKey: ["get-schedules", date],
+    queryFn: () => getSchedulesByDate(formatDate(date)),
+    select: (data) => ({
+      morning: orderBy(data?.morning, ["time"], ["asc"]),
+      afternoon: orderBy(data?.afternoon, ["time"], ["asc"]),
+      evening: orderBy(data?.evening, ["time"], ["asc"]),
+    }),
+  });
+
   return (
     <main className="flex h-screen bg-gray-800 ">
       <section className="basis-[31.125rem] rounded-[12px] bg-gray-700 m-[0.875rem] flex justify-center items-center  py-[5rem]">
@@ -24,7 +86,35 @@ export default function Home() {
               </sub>
             </div>
 
-            <ScheduleByDate />
+            <div className="w-[min(10rem,_100%)] self-center">
+              <Popover.Root>
+                <Popover.Trigger className="group w-full">
+                  <Input.Root className="group-data-[state=open]:border-yellow-dark w-full justify-between">
+                    <Input.Slot className="gap-2 items-center">
+                      <CalendarBlank className="text-yellow-default text-[1.25rem]" />
+                      <span className="font-normal text-gray-200">
+                        {formatDate(date)}
+                      </span>
+                    </Input.Slot>
+
+                    <Input.Slot>
+                      <CaretDown className="text-gray-300 text-[1rem] group-data-[state=open]:rotate-180 transition group-data-[state=closed]:rotate-0" />
+                    </Input.Slot>
+                  </Input.Root>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content align="end" className="w-[21.125rem]">
+                    <Controller
+                      name="date"
+                      control={control}
+                      render={({ field: { value, onChange } }) => (
+                        <DatePicker.Root selected={value} onSelect={onChange} />
+                      )}
+                    />
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+            </div>
           </div>
 
           <div className="flex flex-col gap-[0.75rem] ">
@@ -40,14 +130,21 @@ export default function Home() {
               <div className="h-[1px] bg-gray-600" />
 
               <ul className="px-[1.25rem] py-[1.5rem] flex flex-col gap-[0.375rem]">
-                <li className="text-gray-400 flex gap-[1.25rem] items-center">
-                  <strong className=" font-bold">11:00</strong>
-                  Italo amorzão
-                </li>
-                <li className="text-gray-400 flex gap-[1.25rem] items-center">
-                  <strong className=" font-bold">11:00</strong>
-                  Italo amorzão
-                </li>
+                {schedulesByDate?.morning.length ? (
+                  schedulesByDate?.morning.map(({ id, time, customerName }) => (
+                    <li
+                      key={id}
+                      className="text-gray-400 flex gap-[1.25rem] items-center"
+                    >
+                      <strong className=" font-bold">{time}</strong>
+                      {customerName}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-gray-400 flex gap-[1.25rem] items-center justify-center">
+                    Não há nenhum agendamento para o período
+                  </li>
+                )}
               </ul>
             </article>
 
@@ -63,14 +160,23 @@ export default function Home() {
               <div className="h-[1px] bg-gray-600" />
 
               <ul className="px-[1.25rem] py-[1.5rem] flex flex-col gap-[0.375rem]">
-                <li className="text-gray-400 flex gap-[1.25rem] items-center">
-                  <strong className=" font-bold">11:00</strong>
-                  Italo amorzão
-                </li>
-                <li className="text-gray-400 flex gap-[1.25rem] items-center">
-                  <strong className=" font-bold">11:00</strong>
-                  Italo amorzão
-                </li>
+                {schedulesByDate?.afternoon.length ? (
+                  schedulesByDate?.afternoon.map(
+                    ({ id, time, customerName }) => (
+                      <li
+                        key={id}
+                        className="text-gray-400 flex gap-[1.25rem] items-center"
+                      >
+                        <strong className=" font-bold">{time}</strong>
+                        {customerName}
+                      </li>
+                    ),
+                  )
+                ) : (
+                  <li className="text-gray-400 flex gap-[1.25rem] items-center justify-center">
+                    Não há nenhum agendamento para o período
+                  </li>
+                )}
               </ul>
             </article>
 
@@ -86,14 +192,21 @@ export default function Home() {
               <div className="h-[1px] bg-gray-600" />
 
               <ul className="px-[1.25rem] py-[1.5rem] flex flex-col gap-[0.375rem]">
-                <li className="text-gray-400 flex gap-[1.25rem] items-center">
-                  <strong className=" font-bold">11:00</strong>
-                  Italo amorzão
-                </li>
-                <li className="text-gray-400 flex gap-[1.25rem] items-center">
-                  <strong className=" font-bold">11:00</strong>
-                  Italo amorzão
-                </li>
+                {schedulesByDate?.evening.length ? (
+                  schedulesByDate?.evening.map(({ id, time, customerName }) => (
+                    <li
+                      key={id}
+                      className="text-gray-400 flex gap-[1.25rem] items-center"
+                    >
+                      <strong className=" font-bold">{time}</strong>
+                      {customerName}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-gray-400 flex gap-[1.25rem] items-center justify-center">
+                    Não há nenhum agendamento para o período
+                  </li>
+                )}
               </ul>
             </article>
           </div>
