@@ -65,20 +65,50 @@ const createSchedule = async (data: CreateSchedule) => {
 export function Form() {
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, watch, control, reset, getValues } =
-    useForm<NewScheduleForm>({
-      resolver: zodResolver(schema),
-      defaultValues: {
-        date: new Date(),
-      },
-    });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    reset,
+    getValues,
+    formState: { errors },
+  } = useForm<NewScheduleForm>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      date: new Date(),
+    },
+  });
 
   const { date } = watch();
 
-  const { data: availableTimesByDateInPeriods } = useQuery({
+  const {
+    data: availableTimesByDateInPeriods,
+    isLoading: availableTimesByDateInPeriodsIsLoading,
+  } = useQuery({
     queryKey: ["get-available-times-by-date-in-periods", date],
     queryFn: () => getAvailableTimesByDateInPeriods(formatDate(date)),
     placeholderData: keepPreviousData,
+    initialData: {
+      morning: [
+        {
+          enabled: true,
+          time: "",
+        },
+      ],
+      afternoon: [
+        {
+          enabled: true,
+          time: "",
+        },
+      ],
+      evening: [
+        {
+          enabled: true,
+          time: "",
+        },
+      ],
+    },
   });
 
   const { mutate: handleCreateSchedule } = useMutation({
@@ -182,6 +212,7 @@ export function Form() {
                     disabled={!enabled}
                     onClick={() => onChange(time)}
                     checked={value === time}
+                    loading={availableTimesByDateInPeriodsIsLoading || !time}
                   >
                     {time}
                   </TimeSelect.Root>
@@ -206,6 +237,7 @@ export function Form() {
                       disabled={!enabled}
                       onClick={() => onChange(time)}
                       checked={value === time}
+                      loading={availableTimesByDateInPeriodsIsLoading || !time}
                     >
                       {time}
                     </TimeSelect.Root>
@@ -230,6 +262,7 @@ export function Form() {
                     disabled={!enabled}
                     onClick={() => onChange(time)}
                     checked={value === time}
+                    loading={availableTimesByDateInPeriodsIsLoading || !time}
                   >
                     {time}
                   </TimeSelect.Root>
@@ -252,6 +285,11 @@ export function Form() {
             {...register("customer")}
           />
         </Input.Root>
+        {errors.customer?.message && (
+          <span className="text-sm text-red-500 font-normal">
+            {errors.customer.message}
+          </span>
+        )}
       </label>
 
       <Button.Root type="submit">Agendar</Button.Root>

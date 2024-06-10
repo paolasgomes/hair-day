@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { VariantProps, tv } from "tailwind-variants";
+import SkeletonLoading from "react-loading-skeleton";
 
 const root = tv({
   base: "w-[4.875rem] h-[2.5rem] rounded-[8px] flex items-center justify-center cursor-pointer",
@@ -19,17 +20,35 @@ type Variants = VariantProps<typeof root>;
 type Props = Variants &
   ComponentProps<"button"> & {
     checked: boolean;
+    loading?: boolean;
     children: ReactNode;
   };
 
-export function Root({ className, variant, checked, ...props }: Props) {
+export function Root({
+  className,
+  variant,
+  checked,
+  loading,
+  children,
+  disabled,
+  ...props
+}: Props) {
   return (
     <button
       type="button"
       data-checked={checked}
+      disabled={loading || disabled}
       className={root({ className, variant })}
       {...props}
-    />
+    >
+      {loading && (
+        <SkeletonLoading
+          containerClassName="flex-1 rounded-[8px] "
+          height={"2.5rem"}
+        />
+      )}
+      {!loading && children}
+    </button>
   );
 }
 
